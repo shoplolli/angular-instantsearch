@@ -1,23 +1,23 @@
+import {isPlatformBrowser} from '@angular/common';
 import {
   AfterViewInit,
   Component,
-  Input,
-  OnInit,
-  OnDestroy,
-  Output,
   EventEmitter,
   Inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
   PLATFORM_ID,
   VERSION as AngularVersion,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import {AlgoliaSearchHelper} from 'algoliasearch-helper';
 
 import * as algoliasearchProxy from 'algoliasearch/lite';
 import instantsearch from 'instantsearch.js/es';
-import { AlgoliaSearchHelper } from 'algoliasearch-helper';
 
-import { Widget } from '../base-widget';
-import { VERSION } from '../version';
+import {Widget} from '../base-widget';
+import {VERSION} from '../version';
 
 const algoliasearch = algoliasearchProxy.default || algoliasearchProxy;
 
@@ -158,8 +158,7 @@ type HitHighlightResult = {
     | HitHighlightResult;
 };
 
-type HitAttributeSnippetResult = Pick<
-  HitAttributeHighlightResult,
+type HitAttributeSnippetResult = Pick<HitAttributeHighlightResult,
   'value' | 'matchLevel'
 >;
 
@@ -222,27 +221,27 @@ export type InstantSearchConfig = {
   urlSync?:
     | boolean
     | {
-        mapping?: object;
-        threshold?: number;
-        trackedParameters?: string[];
-        useHash?: boolean;
-        getHistoryState?: () => object;
-      };
+    mapping?: object;
+    threshold?: number;
+    trackedParameters?: string[];
+    useHash?: boolean;
+    getHistoryState?: () => object;
+  };
   routing?:
     | boolean
     | {
-        router?: {
-          onUpdate: (cb: (object) => void) => void;
-          read: () => object;
-          write: (routeState: object) => void;
-          createURL: (routeState: object) => string;
-          dispose: () => void;
-        };
-        stateMapping?: {
-          stateToRoute(object): object;
-          routeToState(object): object;
-        };
-      };
+    router?: {
+      onUpdate: (cb: (object) => void) => void;
+      read: () => object;
+      write: (routeState: object) => void;
+      createURL: (routeState: object) => string;
+      dispose: () => void;
+    };
+    stateMapping?: {
+      stateToRoute(object): object;
+      routeToState(object): object;
+    };
+  };
 };
 
 export class InstantSearchInstance {
@@ -294,8 +293,10 @@ export class NgAisInstantSearch implements AfterViewInit, OnInit, OnDestroy {
   }
 
   public ngOnDestroy() {
-    this.instantSearchInstance.removeListener('render', this.onRender);
-    this.instantSearchInstance.dispose();
+    if (this.instantSearchInstance) {
+      this.instantSearchInstance.removeListener('render', this.onRender);
+      this.instantSearchInstance.dispose();
+    }
   }
 
   public createInstantSearchInstance(config: InstantSearchConfig) {
@@ -322,11 +323,15 @@ export class NgAisInstantSearch implements AfterViewInit, OnInit, OnDestroy {
   }
 
   public addWidget(widget: Widget) {
-    this.instantSearchInstance.addWidget(widget);
+    if (this.instantSearchInstance) {
+      this.instantSearchInstance.addWidget(widget);
+    }
   }
 
   public removeWidget(widget: Widget) {
-    this.instantSearchInstance.removeWidget(widget);
+    if (this.instantSearchInstance) {
+      this.instantSearchInstance.removeWidget(widget);
+    }
   }
 
   public refresh() {

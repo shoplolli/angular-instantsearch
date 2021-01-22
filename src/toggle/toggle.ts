@@ -1,6 +1,6 @@
 import { Component, Input, Inject, forwardRef } from '@angular/core';
 
-import { connectToggle } from 'instantsearch.js/es/connectors';
+import { connectToggleRefinement } from 'instantsearch.js/es/connectors';
 import { BaseWidget } from '../base-widget';
 import { NgAisInstantSearch } from '../instantsearch/instantsearch';
 import { noop } from '../utils';
@@ -12,6 +12,14 @@ export type ToggleState = {
     name?: string;
     count?: number;
     isRefined?: boolean;
+    onFacetValue?: {
+      isRefined: boolean;
+      count: number;
+    };
+    offFacetValue?: {
+      isRefined: boolean;
+      count: number;
+    };
   };
 };
 
@@ -19,35 +27,32 @@ export type ToggleState = {
   selector: 'ais-toggle',
   template: `
     <div [class]="cx()">
-      <ul [class]="cx('list')">
-        <li
-          [class]="cx('item')"
-          (click)="handleClick($event)">
-          <label [class]="cx('label')">
-            <input
-              [class]="cx('checkbox')"
-              type="checkbox"
-              value="{{state.value.name}}"
-              [checked]="state.value.isRefined"
-            />
+      <label [class]="cx('label')">
+        <input
+          [class]="cx('checkbox')"
+          type="checkbox"
+          value="{{state.value.name}}"
+          [checked]="state.value.isRefined"
+          (change)="handleChange($event)"
+        />
 
-            <span [class]="cx('labelText')">
-              {{label || state.value.name}}
-            </span>
+        <span [class]="cx('labelText')">
+          {{label || state.value.name}}
+        </span>
 
-            <span [class]="cx('count')">{{state.value.count}}</span>
-          </label>
-        </li>
-      </ul>
+        <span [class]="cx('count')">{{state.value.count}}</span>
+      </label>
     </div>
   `,
 })
 export class NgAisToggle extends BaseWidget {
-  // connector options
-  @Input() public attribute: string;
+  // rendering options
   @Input() public label: string;
-  @Input()
-  public values: { on?: boolean; off?: boolean } = { on: true, off: undefined };
+
+  // instance options
+  @Input() public attribute: string;
+  @Input() public on?: boolean | number | string;
+  @Input() public off?: boolean | number | string;
 
   public state: ToggleState = {
     createURL: noop,
@@ -63,15 +68,15 @@ export class NgAisToggle extends BaseWidget {
   }
 
   public ngOnInit() {
-    this.createWidget(connectToggle, {
-      attributeName: this.attribute,
-      label: this.label,
-      values: this.values,
+    this.createWidget(connectToggleRefinement, {
+      attribute: this.attribute,
+      on: this.on,
+      off: this.off,
     });
     super.ngOnInit();
   }
 
-  public handleClick(event: MouseEvent) {
+  public handleChange(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
     this.state.refine(this.state.value);

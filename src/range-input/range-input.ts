@@ -6,15 +6,18 @@ import { NgAisInstantSearch } from '../instantsearch/instantsearch';
 import { parseNumberInput, noop } from '../utils';
 
 export type NumericRangeState = {
+  start: number[];
   range: { min?: number; max?: number };
   refine: Function;
-  start: number[];
 };
 
 @Component({
   selector: 'ais-range-input',
   template: `
-    <div [class]="cx()">
+    <div [ngClass]="[
+        cx(), 
+        !canRefine ? cx('', 'noRefinement') : ''
+      ]">
       <form
         [class]="cx('form')"
         (submit)="handleSubmit($event)"
@@ -23,7 +26,10 @@ export type NumericRangeState = {
         <label [class]="cx('label')">
           <span [class]="cx('currency')">{{currency}}</span>
           <input
-            [class]="cx('input', 'min')"
+            [ngClass]="[
+              cx('input'),
+              cx('input', 'min')
+            ]"
             type="number"
             [min]="state.range.min"
             [max]="state.range.max"
@@ -39,7 +45,10 @@ export type NumericRangeState = {
         <label [class]="cx('label')">
           <span [class]="cx('currency')">{{currency}}</span>
           <input
-            [class]="cx('input', 'max')"
+            [ngClass]="[
+              cx('input'),
+              cx('input', 'max')
+            ]"
             type="number"
             [min]="state.range.min"
             [max]="state.range.max"
@@ -61,24 +70,28 @@ export type NumericRangeState = {
   `,
 })
 export class NgAisRangeInput extends BaseWidget {
-  // render options
+  // rendering options
   @Input() public currency: string = '$';
   @Input() public separator: string = 'to';
   @Input() public submitLabel: string = 'Go';
 
-  // connector options
+  // instance options
   @Input() public attribute: string;
-  @Input() public min?: number | string;
-  @Input() public max?: number | string;
-  @Input() public precision: number | string = 2;
+  @Input() public min?: number;
+  @Input() public max?: number;
+  @Input() public precision?: number = 0;
 
   // inner state
   public minInputValue?: number | string = '';
   public maxInputValue?: number | string = '';
 
   get step() {
-    const precision = parseNumberInput(this.precision) || 2;
+    const precision = parseNumberInput(this.precision);
     return 1 / Math.pow(10, precision);
+  }
+
+  get canRefine() {
+    return this.state.range.min !== this.state.range.max;
   }
 
   public state: NumericRangeState = {
@@ -96,7 +109,7 @@ export class NgAisRangeInput extends BaseWidget {
 
   public ngOnInit() {
     this.createWidget(connectRange, {
-      attributeName: this.attribute,
+      attribute: this.attribute,
       max: parseNumberInput(this.max),
       min: parseNumberInput(this.min),
       precision: parseNumberInput(this.precision),

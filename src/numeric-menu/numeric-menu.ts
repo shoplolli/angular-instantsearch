@@ -1,14 +1,21 @@
 import { Component, Input, Inject, forwardRef } from '@angular/core';
 
-import { connectNumericRefinementList } from 'instantsearch.js/es/connectors';
+import { connectNumericMenu } from 'instantsearch.js/es/connectors';
 import { BaseWidget } from '../base-widget';
 import { NgAisInstantSearch } from '../instantsearch/instantsearch';
 import { noop } from '../utils';
 
-export type NumericRefinementListState = {
+export type NumericMenuItem = {
+  label: string;
+  value: string;
+  isRefined: boolean;
+};
+
+export type NumericMenuState = {
   createURL: Function;
-  items: {}[];
+  items: NumericMenuItem[];
   refine: Function;
+  hasNoResults?: boolean;
 };
 
 @Component({
@@ -22,7 +29,6 @@ export type NumericRefinementListState = {
         <li
           [class]="getItemClass(item)"
           *ngFor="let item of state.items"
-          (click)="refine($event, item)"
         >
           <label [class]="cx('label')">
             <input
@@ -30,6 +36,7 @@ export type NumericRefinementListState = {
               type="radio"
               name="NumericMenu"
               [checked]="item.isRefined"
+              (change)="refine($event, item)"
             />
             <span [class]="cx('labelText')">{{item.label}}</span>
           </label>
@@ -40,17 +47,16 @@ export type NumericRefinementListState = {
 })
 export class NgAisNumericMenu extends BaseWidget {
   @Input() public attribute: string;
+  @Input() public items: { label: string; start?: number; end?: number }[];
   @Input()
-  public items: {
-    name: string;
-    start?: number;
-    end?: number;
-  }[];
+  public transformItems?: <U extends NumericMenuItem>(
+    items: NumericMenuItem[]
+  ) => U[];
 
-  public state: NumericRefinementListState = {
-    createURL: noop,
+  public state: NumericMenuState = {
     items: [],
     refine: noop,
+    createURL: noop,
   };
 
   get isHidden() {
@@ -65,9 +71,10 @@ export class NgAisNumericMenu extends BaseWidget {
   }
 
   public ngOnInit() {
-    this.createWidget(connectNumericRefinementList, {
-      attributeName: this.attribute,
-      options: this.items,
+    this.createWidget(connectNumericMenu, {
+      attribute: this.attribute,
+      items: this.items,
+      transformItems: this.transformItems,
     });
     super.ngOnInit();
   }

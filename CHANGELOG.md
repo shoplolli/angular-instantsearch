@@ -1,9 +1,107 @@
-# [2.3.0](https://github.com/algolia/angular-instantsearch/compare/2.2.2...2.3.0) (2020-04-03)
+# [3.0.0-beta.5](https://github.com/algolia/angular-instantsearch/compare/3.0.0-beta.4...3.0.0-beta.5) (2020-04-03)
 
 
 ### Features
 
-* **ssr**: forward options to search client ([#714](https://github.com/algolia/angular-instantsearch/issues/714)) ([9ea22d0](https://github.com/algolia/angular-instantsearch/commit/9ea22d03ac8056ed6a349c1f1613e3a715679620))
+* **ssr:** forward options to search client ([#715](https://github.com/algolia/angular-instantsearch/issues/715)) ([8355c97](https://github.com/algolia/angular-instantsearch/commit/8355c971709b2aae7e4feef6c8ba61709fc43699))
+
+
+
+# [3.0.0-beta.4](https://github.com/algolia/angular-instantsearch/compare/3.0.0-beta.3...3.0.0-beta.4) (2019-07-29)
+
+
+### Bug Fixes
+
+* **StarRating:** fix overflowing symbols ([#659](https://github.com/algolia/angular-instantsearch/issues/659)) ([ce98a2b](https://github.com/algolia/angular-instantsearch/commit/ce98a2b))
+
+
+
+# [3.0.0-beta.3](https://github.com/algolia/angular-instantsearch/compare/3.0.0-beta.2...3.0.0-beta.3) (2019-07-22)
+
+
+### Bug Fixes
+
+* **pagination:** set showLast as true by default ([#623](https://github.com/algolia/angular-instantsearch/issues/623)) ([f79951a](https://github.com/algolia/angular-instantsearch/commit/f79951a))
+* **toggle:** update checkbox when clicking the checkbox itself ([#624](https://github.com/algolia/angular-instantsearch/issues/624)) ([dffaedd](https://github.com/algolia/angular-instantsearch/commit/dffaedd))
+* add `ais-Pagination--noRefinement` CSS class on root when nbPages <= 1 ([#641](https://github.com/algolia/angular-instantsearch/issues/641)) ([fa3ea60](https://github.com/algolia/angular-instantsearch/commit/fa3ea60)), closes [/github.com/algolia/react-instantsearch/blob/99ed761dc0536fafb884727ed593ee0906b80b7a/packages/react-instantsearch-core/src/connectors/connectPagination.js#L67](https://github.com//github.com/algolia/react-instantsearch/blob/99ed761dc0536fafb884727ed593ee0906b80b7a/packages/react-instantsearch-core/src/connectors/connectPagination.js/issues/L67)
+* add ais-StarRating--noRefinement CSS class on root when items === [] ([#647](https://github.com/algolia/angular-instantsearch/issues/647)) ([a7bc8c0](https://github.com/algolia/angular-instantsearch/commit/a7bc8c0)), closes [/github.com/algolia/instantsearch.js/blob/b6ee2596d353ea692d91929759bc2b2fe34945c7/src/components/RefinementList/RefinementList.js#L226-L228](https://github.com//github.com/algolia/instantsearch.js/blob/b6ee2596d353ea692d91929759bc2b2fe34945c7/src/components/RefinementList/RefinementList.js/issues/L226-L228) [/github.com/algolia/vue-instantsearch/blob/aa7ba065d897b9a5654b04f6bbd23818eaf83baa/src/components/RatingMenu.vue#L4](https://github.com//github.com/algolia/vue-instantsearch/blob/aa7ba065d897b9a5654b04f6bbd23818eaf83baa/src/components/RatingMenu.vue/issues/L4) [/github.com/algolia/react-instantsearch/blob/05a85b61d6e3e3e946c07d05f26fe38289c9920a/packages/react-instantsearch-core/src/connectors/connectRange.js#L247](https://github.com//github.com/algolia/react-instantsearch/blob/05a85b61d6e3e3e946c07d05f26fe38289c9920a/packages/react-instantsearch-core/src/connectors/connectRange.js/issues/L247)
+* add missing class names (Breadcrumb & RangeInput) ([#626](https://github.com/algolia/angular-instantsearch/issues/626)) ([0fe926e](https://github.com/algolia/angular-instantsearch/commit/0fe926e))
+
+
+### Tests
+
+* **utils:** add tests for bem ([#614](https://github.com/algolia/angular-instantsearch/issues/614)) ([497d714](https://github.com/algolia/angular-instantsearch/commit/497d714))
+* test(utils): add test for root element
+
+
+### BREAKING CHANGES
+
+* **pagination:** The default value used to be `false`. According to the InstantSearch specs, it should be `true`.
+* **utils:** `ais-body` class has been removed from `ais-range-slide` component
+
+
+
+
+# [3.0.0-beta.2](https://github.com/algolia/angular-instantsearch/compare/3.0.0-beta.1...3.0.0-beta.2) (2019-06-05)
+
+
+### Bug Fixes
+
+* **Breadcrumb:** add missing instance options and types ([#515](https://github.com/algolia/angular-instantsearch/issues/515)) ([735c2a1](https://github.com/algolia/angular-instantsearch/commit/735c2a1))
+* **ClearRefinements:** use connector transformItems ([#561](https://github.com/algolia/angular-instantsearch/issues/561)) ([cbd0d30](https://github.com/algolia/angular-instantsearch/commit/cbd0d30))
+* **HierarchicalMenu:** improve types ([#557](https://github.com/algolia/angular-instantsearch/issues/557)) ([869def1](https://github.com/algolia/angular-instantsearch/commit/869def1))
+* **HierarchicalMenu:** use connector transformItems ([#558](https://github.com/algolia/angular-instantsearch/issues/558)) ([1b1ff8d](https://github.com/algolia/angular-instantsearch/commit/1b1ff8d))
+* **Hits:** add Hits story showcasing transformItems ([#552](https://github.com/algolia/angular-instantsearch/issues/552)) ([5cf44e1](https://github.com/algolia/angular-instantsearch/commit/5cf44e1))
+* **HitsPerPage:** use connector transformItems ([#562](https://github.com/algolia/angular-instantsearch/issues/562)) ([05b4f96](https://github.com/algolia/angular-instantsearch/commit/05b4f96)), closes [#372](https://github.com/algolia/angular-instantsearch/issues/372)
+* **InfiniteHits:** improve typing ([#553](https://github.com/algolia/angular-instantsearch/issues/553)) ([39c67e9](https://github.com/algolia/angular-instantsearch/commit/39c67e9))
+* **InfiniteHits:** update connector instances options ([#554](https://github.com/algolia/angular-instantsearch/issues/554)) ([a81894c](https://github.com/algolia/angular-instantsearch/commit/a81894c))
+* **numeric-menu:** prevent refinement reset on checked radio click ([#501](https://github.com/algolia/angular-instantsearch/issues/501)) ([b20117a](https://github.com/algolia/angular-instantsearch/commit/b20117a))
+* **NumericMenu:** use connector transformItems  ([#560](https://github.com/algolia/angular-instantsearch/issues/560)) ([3c8b434](https://github.com/algolia/angular-instantsearch/commit/3c8b434))
+* **types:** update Hit type ([#579](https://github.com/algolia/angular-instantsearch/issues/579)) ([3526015](https://github.com/algolia/angular-instantsearch/commit/3526015)), closes [/github.com/algolia/instantsearch.js/blob/65911504b9ae0e2596c75f0ae74133985dc79850/src/types/instantsearch.ts#L20-L71](https://github.com//github.com/algolia/instantsearch.js/blob/65911504b9ae0e2596c75f0ae74133985dc79850/src/types/instantsearch.ts/issues/L20-L71) [/github.com/algolia/angular-instantsearch/pull/553/files#r284135258](https://github.com//github.com/algolia/angular-instantsearch/pull/553/files/issues/r284135258)
+
+
+### Features
+
+* **Hits:** expose escapeHTML instance option ([#578](https://github.com/algolia/angular-instantsearch/issues/578)) ([9bb1fb3](https://github.com/algolia/angular-instantsearch/commit/9bb1fb3))
+* **ssr:** update createSSRSearchClient() ([#500](https://github.com/algolia/angular-instantsearch/issues/500)) ([db9e597](https://github.com/algolia/angular-instantsearch/commit/db9e597))
+* **voiceSearch:** add voice search component ([#530](https://github.com/algolia/angular-instantsearch/issues/530)) ([865cf5c](https://github.com/algolia/angular-instantsearch/commit/865cf5c))
+
+
+
+# [3.0.0-beta.1](https://github.com/algolia/angular-instantsearch/compare/3.0.0-beta.0...3.0.0-beta.1) (2019-04-26)
+
+
+### Bug Fixes
+
+* **Hits:** add test for template support ([#490](https://github.com/algolia/angular-instantsearch/issues/490)) ([9a6a41e](https://github.com/algolia/angular-instantsearch/commit/9a6a41e))
+* **RangeInput:** allow precision of 0 ([#495](https://github.com/algolia/angular-instantsearch/issues/495)) ([d1d9a26](https://github.com/algolia/angular-instantsearch/commit/d1d9a26))
+* **stories:** update Query Rules stories ([#484](https://github.com/algolia/angular-instantsearch/issues/484)) ([62c5903](https://github.com/algolia/angular-instantsearch/commit/62c5903))
+* **ua:** change the User-Agent to use the new specs lib (version) ([#481](https://github.com/algolia/angular-instantsearch/issues/481)) ([6fab272](https://github.com/algolia/angular-instantsearch/commit/6fab272))
+
+
+### Features
+
+* **infiniteHits:** add previous button ([#486](https://github.com/algolia/angular-instantsearch/issues/486)) ([2c13674](https://github.com/algolia/angular-instantsearch/commit/2c13674))
+* **insights:** add insights support to Hits widget ([#492](https://github.com/algolia/angular-instantsearch/issues/492)) ([cdb9cae](https://github.com/algolia/angular-instantsearch/commit/cdb9cae))
+* **insights:** add insights support to InfiniteHits widget ([#493](https://github.com/algolia/angular-instantsearch/issues/493)) ([1ae9625](https://github.com/algolia/angular-instantsearch/commit/1ae9625))
+* **queryRules:** add ais-query-rule-custom-data widget ([#482](https://github.com/algolia/angular-instantsearch/issues/482)) ([7cba8d8](https://github.com/algolia/angular-instantsearch/commit/7cba8d8)), closes [#483](https://github.com/algolia/angular-instantsearch/issues/483)
+* **searchClient:** enforce search client ([#496](https://github.com/algolia/angular-instantsearch/issues/496)) ([f552d9f](https://github.com/algolia/angular-instantsearch/commit/f552d9f))
+
+
+
+# [3.0.0-beta.0](https://github.com/algolia/angular-instantsearch/compare/2.2.0...3.0.0-beta.0) (2019-02-13)
+
+
+### Bug Fixes
+
+* **InfiniteHits:** fix showMore button class to ([152da2f](https://github.com/algolia/angular-instantsearch/commit/152da2f))
+* **NumericSelector:** remove NumericSelector as no longer part of the spec ([8c5edd9](https://github.com/algolia/angular-instantsearch/commit/8c5edd9)), closes [#408](https://github.com/algolia/angular-instantsearch/issues/408)
+* **RefinementList:** introduce showMore prop to hide button ([f3e769c](https://github.com/algolia/angular-instantsearch/commit/f3e769c))
+
+
+### Features
+
+* **deps:** migrate to InstantSearch V3 ([#463](https://github.com/algolia/angular-instantsearch/issues/463)) ([81136b1](https://github.com/algolia/angular-instantsearch/commit/81136b1))
 
 
 

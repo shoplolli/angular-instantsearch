@@ -1,14 +1,22 @@
 import { Component, Input, Inject, forwardRef } from '@angular/core';
 
-import { connectStarRating } from 'instantsearch.js/es/connectors';
+import { connectRatingMenu } from 'instantsearch.js/es/connectors';
 import { BaseWidget } from '../base-widget';
 import { NgAisInstantSearch } from '../instantsearch/instantsearch';
-import { noop } from '../utils';
+import { noop, parseNumberInput } from '../utils';
+
+export type RatingMenuItem = {
+  count: number;
+  isRefined: boolean;
+  name: string;
+  value: string;
+  stars: boolean[];
+};
 
 export type RatingMenuState = {
   createURL: Function;
   hasNoResults: boolean;
-  items: {}[];
+  items: RatingMenuItem[];
   refine: Function;
 };
 
@@ -16,23 +24,22 @@ export type RatingMenuState = {
   selector: 'ais-rating-menu',
   template: `
     <div
-      [class]="cx()"
+      [ngClass]="[
+        cx(),
+        state.items.length === 0 ? cx('', 'noRefinement') : ''
+      ]"
       *ngIf="!isHidden"
     >
       <svg style="display:none;">
         <symbol
           id="ais-StarRating-starSymbol"
           viewBox="0 0 24 24"
-          width="24"
-          height="24"
         >
           <path d="M12 .288l2.833 8.718h9.167l-7.417 5.389 2.833 8.718-7.416-5.388-7.417 5.388 2.833-8.718-7.416-5.389h9.167z"/>
         </symbol>
         <symbol
           id="ais-StarRating-starEmptySymbol"
           viewBox="0 0 24 24"
-          width="24"
-          height="24"
         >
           <path d="M12 6.76l1.379 4.246h4.465l-3.612 2.625 1.379 4.246-3.611-2.625-3.612 2.625 1.379-4.246-3.612-2.625h4.465l1.38-4.246zm0-6.472l-2.833 8.718h-9.167l7.416 5.389-2.833 8.718 7.417-5.388 7.416 5.388-2.833-8.718 7.417-5.389h-9.167l-2.833-8.718z"/>
         </symbol>
@@ -50,8 +57,10 @@ export type RatingMenuState = {
             (click)="handleClick($event, item.value)"
           >
             <svg
+              width="24"
+              height="24"
               *ngFor="let star of item.stars"
-              [ngClass]="cx('starIcon')"
+              [ngClass]="cx('starIcon') + ' ' + (star ? cx('starIcon', 'full') : cx('starIcon', 'empty'))"
               aria-hidden="true"
             >
               <use
@@ -76,12 +85,12 @@ export type RatingMenuState = {
   `,
 })
 export class NgAisRatingMenu extends BaseWidget {
-  // render options
+  // rendering options
   @Input() public andUpLabel: string = '& Up';
 
-  // connectors options
+  // instance options
   @Input() public attribute: string;
-  @Input() public max?: number = 5;
+  @Input() public max?: number;
 
   public state: RatingMenuState = {
     createURL: noop,
@@ -102,9 +111,9 @@ export class NgAisRatingMenu extends BaseWidget {
   }
 
   public ngOnInit() {
-    this.createWidget(connectStarRating, {
-      attributeName: this.attribute,
-      max: this.max,
+    this.createWidget(connectRatingMenu, {
+      attribute: this.attribute,
+      max: parseNumberInput(this.max),
     });
     super.ngOnInit();
   }

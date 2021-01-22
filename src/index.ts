@@ -21,8 +21,6 @@ import { NgAisMenuModule } from './menu/menu.module';
 export { NgAisMenuModule };
 import { NgAisNumericMenuModule } from './numeric-menu/numeric-menu.module';
 export { NgAisNumericMenuModule };
-import { NgAisNumericSelectorModule } from './numeric-selector/numeric-selector.module';
-export { NgAisNumericSelectorModule };
 import { NgAisPaginationModule } from './pagination/pagination.module';
 export { NgAisPaginationModule };
 import { NgAisRangeSliderModule } from './range-slider/range-slider.module';
@@ -47,13 +45,16 @@ import { NgAisPanelModule } from './panel/panel.module';
 export { NgAisPanelModule };
 import { NgAisConfigureModule } from './configure/configure.module';
 export { NgAisConfigureModule };
+import { NgAisQueryRuleCustomDataModule } from './query-rule-custom-data/query-rule-custom-data.module';
+export { NgAisQueryRuleCustomDataModule };
+import { NgAisQueryRuleContextModule } from './query-rule-context/query-rule-context.module';
+export { NgAisQueryRuleContextModule };
+import { NgAisVoiceSearchModule } from './voice-search/voice-search.module';
+export { NgAisVoiceSearchModule };
 
-// Custom SSR algoliasearchClient
-import {
-  createSSRAlgoliaClient,
-  createSSRSearchClient,
-} from './create-ssr-algolia-client';
-export { createSSRAlgoliaClient, createSSRSearchClient };
+// Server-side rendering search client
+import { createSSRSearchClient } from './create-ssr-search-client';
+export { createSSRSearchClient };
 
 import { parseServerRequest } from './parse-server-request';
 export { parseServerRequest };
@@ -75,7 +76,6 @@ const NGIS_MODULES = [
   NgAisRefinementListModule,
   NgAisHitsPerPageModule,
   NgAisSortByModule,
-  NgAisNumericSelectorModule,
   NgAisNumericMenuModule,
   NgAisStatsModule,
   NgAisToggleModule,
@@ -89,6 +89,9 @@ const NGIS_MODULES = [
   NgAisRangeInputModule,
   NgAisPanelModule,
   NgAisConfigureModule,
+  NgAisQueryRuleCustomDataModule,
+  NgAisQueryRuleContextModule,
+  NgAisVoiceSearchModule,
 ];
 
 @NgModule({

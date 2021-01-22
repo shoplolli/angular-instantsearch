@@ -1,15 +1,25 @@
 import { Component, Input, Inject, forwardRef } from '@angular/core';
 import { connectRefinementList } from 'instantsearch.js/es/connectors';
 import { BaseWidget } from '../base-widget';
-import { NgAisInstantSearch } from '../instantsearch/instantsearch';
-import { parseNumberInput, noop } from '../utils';
+import {
+  NgAisInstantSearch,
+  FacetSortByStringOptions,
+} from '../instantsearch/instantsearch';
+import { noop, parseNumberInput } from '../utils';
+
+export type RefinementListItem = {
+  value: string;
+  label: string;
+  count: number;
+  isRefined: boolean;
+};
 
 export type RefinementListState = {
   canRefine: boolean;
   canToggleShowMore: boolean;
   createURL: Function;
   isShowingMore: boolean;
-  items: {}[];
+  items: RefinementListItem[];
   refine: Function;
   toggleShowMore: Function;
   searchForItems: Function;
@@ -37,7 +47,7 @@ export type RefinementListState = {
       <ul [class]="cx('list')">
         <li
           [class]="getItemClass(item)"
-          *ngFor="let item of items"
+          *ngFor="let item of state.items"
           (click)="refine($event, item)"
         >
           <label [class]="cx('label')">
@@ -57,8 +67,9 @@ export type RefinementListState = {
 
       <button
         [class]="cx('showMore')"
-        *ngIf="showMoreLimit && state.canToggleShowMore"
+        *ngIf="showMore"
         (click)="state.toggleShowMore()"
+        [disabled]="!state.canToggleShowMore"
       >
         {{state.isShowingMore ? showLessLabel : showMoreLabel}}
       </button>
@@ -66,19 +77,26 @@ export type RefinementListState = {
   `,
 })
 export class NgAisRefinementList extends BaseWidget {
-  // render options
+  // rendering options
   @Input() public showMoreLabel: string = 'Show more';
   @Input() public showLessLabel: string = 'Show less';
-  @Input() public transformItems?: Function;
   @Input() public searchable?: boolean;
   @Input() public searchPlaceholder: string = 'Search here...';
 
-  // connectors options
+  // instance options
   @Input() public attribute: string;
-  @Input() public operator: 'or' | 'and' = 'or';
-  @Input() public limit: number | string = 10;
-  @Input() public showMoreLimit: number | string;
-  @Input() public sortBy: string[] | ((item: object) => number);
+  @Input() public operator: 'or' | 'and';
+  @Input() public limit: number;
+  @Input() public showMore: boolean;
+  @Input() public showMoreLimit: number;
+  @Input()
+  public sortBy:
+    | FacetSortByStringOptions[]
+    | ((a: RefinementListItem, b: RefinementListItem) => number);
+  @Input()
+  public transformItems?: <U extends RefinementListItem>(
+    items: RefinementListItem[]
+  ) => U[];
 
   public state: RefinementListState = {
     canRefine: false,
@@ -103,20 +121,16 @@ export class NgAisRefinementList extends BaseWidget {
     super('RefinementList');
   }
 
-  get items() {
-    return typeof this.transformItems === 'function'
-      ? this.transformItems(this.state.items)
-      : this.state.items;
-  }
-
   public ngOnInit() {
     this.createWidget(connectRefinementList, {
+      showMore: this.showMore,
       limit: parseNumberInput(this.limit),
       showMoreLimit: parseNumberInput(this.showMoreLimit),
-      attributeName: this.attribute,
+      attribute: this.attribute,
       operator: this.operator,
       sortBy: this.sortBy,
       escapeFacetValues: true,
+      transformItems: this.transformItems,
     });
 
     super.ngOnInit();

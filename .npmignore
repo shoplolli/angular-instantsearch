@@ -1,0 +1,16 @@
+*.log
+.git
+.gitignore
+.nyc_output
+lib
+src
+test
+tsconfig*.json
+tslint.json
+*.enc
+.mocharc.yaml
+.eslintignore
+.eslintrc*
+cloudbuild*.yaml
+.editorconfig
+.npmrc

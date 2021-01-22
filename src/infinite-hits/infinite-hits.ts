@@ -7,10 +7,19 @@ import {
   forwardRef,
 } from '@angular/core';
 
-import { connectInfiniteHits } from 'instantsearch.js/es/connectors';
+import { connectInfiniteHitsWithInsights } from 'instantsearch.js/es/connectors';
 import { BaseWidget } from '../base-widget';
-import { NgAisInstantSearch } from '../instantsearch/instantsearch';
+import { NgAisInstantSearch, Hit } from '../instantsearch/instantsearch';
 import { noop } from '../utils';
+
+export type InfiniteHitsState = {
+  hits: Hit[];
+  results: any;
+  isFirstPage: boolean;
+  isLastPage: boolean;
+  showMore: Function;
+  showPrevious: Function;
+};
 
 @Component({
   selector: 'ais-infinite-hits',
@@ -19,6 +28,15 @@ import { noop } from '../utils';
       <ng-container *ngTemplateOutlet="template; context: state"></ng-container>
 
       <!-- default rendering if no template specified -->
+      <button
+        [ngClass]="[cx('loadPrevious'), this.state.isFirstPage ? cx('loadPrevious', 'disabled') : '']"
+        (click)="showPreviousHandler($event)"
+        [disabled]="state.isFirstPage"
+        *ngIf="showPrevious && !template"
+      >
+        {{showPreviousLabel}}
+      </button>
+
       <div *ngIf="!template">
         <ul [class]="cx('list')">
           <li
@@ -32,8 +50,8 @@ import { noop } from '../utils';
       </div>
 
       <button
-        [class]="cx('showMore')"
-        (click)="showMore($event)"
+        [ngClass]="[cx('loadMore'), this.state.isLastPage ? cx('loadMore', 'disabled') : '']"
+        (click)="showMoreHandler($event)"
         [disabled]="state.isLastPage"
         *ngIf="!template"
       >
@@ -45,20 +63,20 @@ import { noop } from '../utils';
 export class NgAisInfiniteHits extends BaseWidget {
   @ContentChild(TemplateRef) public template?: any;
 
-  // render options
+  // rendering options
+  @Input() public escapeHTML: boolean;
+  @Input() public showPrevious: boolean = false;
+  @Input() public showPreviousLabel: string = 'Show previous results';
   @Input() public showMoreLabel: string = 'Show more results';
-  @Input() public transformItems?: Function;
+  @Input() public transformItems?: <U extends Hit>(items: Hit[]) => U[];
 
   // inner widget state returned from connector
-  public state: {
-    hits: {}[];
-    isLastPage: boolean;
-    showMore: Function;
-    results: {};
-  } = {
+  public state: InfiniteHitsState = {
     hits: [],
+    isFirstPage: false,
     isLastPage: false,
     showMore: noop,
+    showPrevious: noop,
     results: {},
   };
 
@@ -67,24 +85,28 @@ export class NgAisInfiniteHits extends BaseWidget {
     public instantSearchParent: any
   ) {
     super('InfiniteHits');
-    this.createWidget(connectInfiniteHits, { escapeHits: true });
   }
 
-  public showMore(event: MouseEvent) {
+  ngOnInit() {
+    this.createWidget(connectInfiniteHitsWithInsights, {
+      escapeHTML: this.escapeHTML,
+      transformItems: this.transformItems,
+    });
+    super.ngOnInit();
+  }
+
+  public showMoreHandler(event: MouseEvent) {
     event.preventDefault();
     this.state.showMore();
   }
 
+  public showPreviousHandler(event: MouseEvent) {
+    event.preventDefault();
+    this.state.showPrevious();
+  }
+
   updateState = (state, isFirstRendering: boolean) => {
     if (isFirstRendering) return;
-
-    this.state = {
-      ...state,
-      results: state.results,
-      hits:
-        typeof this.transformItems === 'function'
-          ? this.transformItems(state.hits)
-          : state.hits,
-    };
+    this.state = state;
   };
 }

@@ -5,9 +5,9 @@ import { NgAisInstantSearch } from '../instantsearch/instantsearch';
 import { noop } from '../utils';
 
 export type BreadcrumbState = {
-  createURL: Function;
+  createURL: (value: string) => string;
   items: BreadcrumbItem[];
-  refine: Function;
+  refine: (value: string) => void;
 };
 
 export type BreadcrumbItem = {
@@ -25,7 +25,7 @@ export type BreadcrumbItem = {
       <ul [class]="cx('list')">
         <li
           *ngFor="let item of items"
-          [class]="cx('item', item.isLast ? 'selected' : undefined)"
+          [ngClass]="[cx('item'), item.isLast ? cx('item', 'selected') : '']"
           (click)="handleClick($event, item)"
         >
           <span
@@ -41,11 +41,11 @@ export type BreadcrumbItem = {
             *ngIf="!item.isLast"
             (click)="handleClick($event, item)"
           >
-            {{item.name}}
+            {{item.label}}
           </a>
 
           <span *ngIf="item.isLast">
-            {{item.name}}
+            {{item.label}}
           </span>
         </li>
       </ul>
@@ -53,9 +53,14 @@ export type BreadcrumbItem = {
   `,
 })
 export class NgAisBreadcrumb extends BaseWidget {
-  // connector options
+  // instance options
   @Input() public attributes: string[];
   @Input() public rootPath?: string;
+  @Input() public separator?: string;
+  @Input()
+  public transformItems?: <U extends BreadcrumbItem>(
+    items: BreadcrumbItem[]
+  ) => U[];
 
   get isHidden() {
     return this.state.items.length === 0 && this.autoHideContainer;
@@ -66,11 +71,13 @@ export class NgAisBreadcrumb extends BaseWidget {
       ...item,
       separator: idx !== 0,
       isLast: idx === this.state.items.length - 1,
+      // FIXME: get rid of this. We can use `last` local variable
+      // https://angular.io/api/common/NgForOf#local-variables
     }));
   }
 
   public state: BreadcrumbState = {
-    createURL: noop,
+    createURL: () => '#',
     items: [],
     refine: noop,
   };
@@ -86,12 +93,14 @@ export class NgAisBreadcrumb extends BaseWidget {
     this.createWidget(connectBreadcrumb, {
       attributes: this.attributes,
       rootPath: this.rootPath,
+      separator: this.separator,
+      transformItems: this.transformItems,
     });
 
     super.ngOnInit();
   }
 
-  public handleClick(event: MouseEvent, item: BreadcrumbItem) {
+  public handleClick(event: MouseEvent, item: BreadcrumbItem): void {
     event.preventDefault();
     event.stopPropagation();
 

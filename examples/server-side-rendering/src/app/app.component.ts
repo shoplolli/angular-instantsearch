@@ -7,6 +7,10 @@ import {
   createSSRSearchClient,
   parseServerRequest,
 } from 'angular-instantsearch';
+import {
+  InstantSearchConfig,
+  SearchParameters,
+} from 'angular-instantsearch/instantsearch/instantsearch';
 
 @Component({
   selector: 'app-root',
@@ -43,9 +47,9 @@ import {
                 header="Sort by"
                 [items]="
                   [
-                    {name: 'instant_search', label: 'Featured'},
-                    {name: 'instant_search_price_asc', label: 'Price asc.'},
-                    {name: 'instant_search_price_desc', label: 'Price desc.'}
+                    {value: 'instant_search', label: 'Featured'},
+                    {value: 'instant_search_price_asc', label: 'Price asc.'},
+                    {value: 'instant_search_price_desc', label: 'Price desc.'}
                   ]
                 "
               >
@@ -62,7 +66,8 @@ import {
   styles: [],
 })
 export class AppComponent {
-  public instantsearchConfig: {};
+  public instantsearchConfig: InstantSearchConfig;
+  public searchParameters: SearchParameters;
 
   constructor(
     private httpClient: HttpClient,
@@ -79,7 +84,7 @@ export class AppComponent {
     this.instantsearchConfig = {
       searchParameters,
       indexName: 'instant_search',
-      urlSync: true,
+      routing: true,
       searchClient: createSSRSearchClient({
         makeStateKey,
         HttpHeaders,

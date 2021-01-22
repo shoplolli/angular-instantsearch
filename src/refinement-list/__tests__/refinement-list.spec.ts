@@ -55,16 +55,16 @@ describe('RefinementList', () => {
       expect(createWidget.mock.calls[0][0]).toEqual(connectRefinementList);
     });
     it('should be called with attributeName undefined by default', () => {
-      render(`<ais-refinement-list></ais-refinement-list>\``);
-      expect(createWidget.mock.calls[0][1].attributeName).toBeUndefined();
+      render(`<ais-refinement-list></ais-refinement-list>`);
+      expect(createWidget.mock.calls[0][1].attribute).toBeUndefined();
     });
     it('should be called with attributeName passed down by attribute prop', () => {
       render(`<ais-refinement-list attribute="brands"></ais-refinement-list>`);
-      expect(createWidget.mock.calls[0][1].attributeName).toEqual('brands');
+      expect(createWidget.mock.calls[0][1].attribute).toEqual('brands');
     });
-    it('should be called with limit 10 by default', () => {
+    it('should be called with limit undefined by default', () => {
       render(`<ais-refinement-list></ais-refinement-list>`);
-      expect(createWidget.mock.calls[0][1].limit).toEqual(10);
+      expect(createWidget.mock.calls[0][1].limit).toEqual(undefined);
     });
     it('should be called with limit passed down as prop', () => {
       render(`<ais-refinement-list [limit]="30"></ais-refinement-list>`);
@@ -80,10 +80,6 @@ describe('RefinementList', () => {
       );
       expect(createWidget.mock.calls[0][1].showMoreLimit).toEqual(30);
     });
-    it('should be called with operator "or" by default', () => {
-      render(`<ais-refinement-list></ais-refinement-list>`);
-      expect(createWidget.mock.calls[0][1].operator).toEqual('or');
-    });
     it('should be called with operator passed down as prop', () => {
       render(`<ais-refinement-list operator="and"></ais-refinement-list>`);
       expect(createWidget.mock.calls[0][1].operator).toEqual('and');
@@ -95,6 +91,12 @@ describe('RefinementList', () => {
     it('should be called with sortBy passed down as prop', () => {
       render(`<ais-refinement-list sortBy="name"></ais-refinement-list>`);
       expect(createWidget.mock.calls[0][1].sortBy).toEqual('name');
+    });
+    it('should be called with sortBy passed down as prop', () => {
+      render(
+        `<ais-refinement-list [transformItems]="'func'"></ais-refinement-list>`
+      );
+      expect(createWidget.mock.calls[0][1].transformItems).toEqual('func');
     });
     it('should be called with escapeFacetValues true by default', () => {
       render(`<ais-refinement-list></ais-refinement-list>`);
@@ -112,6 +114,99 @@ describe('RefinementList', () => {
       fixture.detectChanges();
       return fixture;
     };
+    it('should not show [show more] button when showMore === false', () => {
+      const fixture = createFixture(
+        {},
+        {
+          limit: 5,
+        }
+      );
+
+      const showMoreBtn = fixture.debugElement.nativeElement.querySelector(
+        'button'
+      );
+      expect(showMoreBtn).toBe(null);
+    });
+
+    it('should show [show more] button when showMore === true', () => {
+      const fixture = createFixture(
+        {
+          toggleShowMore: jest.fn(),
+        },
+        {
+          showMore: true,
+          limit: 5,
+          showMoreLabel: 'Please more',
+          showLessLabel: 'Please less',
+        }
+      );
+
+      const showMoreBtn = fixture.debugElement.nativeElement.querySelector(
+        'button'
+      );
+      expect(showMoreBtn.innerHTML.trim()).toEqual('Please more');
+    });
+
+    it('should show [show more] button as disabled when canToggleShowMore === false', () => {
+      const fixture = createFixture(
+        {
+          toggleShowMore: jest.fn(),
+          canToggleShowMore: false,
+        },
+        {
+          showMore: true,
+          limit: 5,
+          showMoreLabel: 'Please more',
+          showLessLabel: 'Please less',
+        }
+      );
+
+      const showMoreBtn = fixture.debugElement.nativeElement.querySelector(
+        'button'
+      );
+      expect(showMoreBtn.disabled).toEqual(true);
+    });
+
+    it('should show [show more] button as enabled when canToggleShowMore === true', () => {
+      const fixture = createFixture(
+        {
+          toggleShowMore: jest.fn(),
+          canToggleShowMore: true,
+        },
+        {
+          showMore: true,
+          limit: 5,
+          showMoreLabel: 'Please more',
+          showLessLabel: 'Please less',
+        }
+      );
+
+      const showMoreBtn = fixture.debugElement.nativeElement.querySelector(
+        'button'
+      );
+      expect(showMoreBtn.disabled).toEqual(false);
+    });
+
+    it('should show [show less] button when isShowingMore === true', () => {
+      const fixture = createFixture(
+        {
+          toggleShowMore: jest.fn(),
+          isShowingMore: true,
+        },
+        {
+          showMore: true,
+          limit: 5,
+          showMoreLabel: 'Please more',
+          showLessLabel: 'Please less',
+        }
+      );
+
+      const showMoreBtn = fixture.debugElement.nativeElement.querySelector(
+        'button'
+      );
+      expect(showMoreBtn.innerHTML.trim()).toEqual('Please less');
+    });
+
     it('should have ais-RefinementList-showMore CSS class', () => {
       const fixture = createFixture(
         {
@@ -119,6 +214,7 @@ describe('RefinementList', () => {
           canToggleShowMore: true,
         },
         {
+          showMore: true,
           limit: 5,
           showMoreLimit: 10,
         }
@@ -140,6 +236,7 @@ describe('RefinementList', () => {
           canToggleShowMore: true,
         },
         {
+          showMore: true,
           limit: 5,
           showMoreLimit: 10,
         }

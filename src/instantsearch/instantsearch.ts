@@ -1,23 +1,23 @@
+import {isPlatformBrowser} from '@angular/common';
 import {
   AfterViewInit,
   Component,
-  Input,
-  OnInit,
-  OnDestroy,
-  Output,
   EventEmitter,
   Inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
   PLATFORM_ID,
   VERSION as AngularVersion,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import {AlgoliaSearchHelper} from 'algoliasearch-helper';
 
 import * as algoliasearchProxy from 'algoliasearch/lite';
 import instantsearch from 'instantsearch.js/es';
-import { AlgoliaSearchHelper } from 'algoliasearch-helper';
 
-import { Widget } from '../base-widget';
-import { VERSION } from '../version';
+import {Widget} from '../base-widget';
+import {VERSION} from '../version';
 
 const algoliasearch = algoliasearchProxy.default || algoliasearchProxy;
 
@@ -122,6 +122,15 @@ export interface SearchForFacetValuesRequestParameters
 export type GeoRectangle = [number, number, number, number];
 export type GeoPolygon = [number, number, number, number, number, number];
 
+export type FacetSortByStringOptions =
+  | 'count'
+  | 'count:asc'
+  | 'count:desc'
+  | 'name'
+  | 'name:asc'
+  | 'name:desc'
+  | 'isRefined';
+
 // Documentation: https://www.algolia.com/doc/rest-api/search/?language=javascript#search-multiple-indexes
 export type SearchResponse = {
   hits: Hit[];
@@ -135,8 +144,56 @@ export type SearchResponse = {
   index?: string;
 };
 
+type HitAttributeHighlightResult = {
+  value: string;
+  matchLevel: 'none' | 'partial' | 'full';
+  matchedWords: string[];
+  fullyHighlighted?: boolean;
+};
+
+type HitHighlightResult = {
+  [attribute: string]:
+    | HitAttributeHighlightResult
+    | HitAttributeHighlightResult[]
+    | HitHighlightResult;
+};
+
+type HitAttributeSnippetResult = Pick<HitAttributeHighlightResult,
+  'value' | 'matchLevel'
+>;
+
+type HitSnippetResult = {
+  [attribute: string]:
+    | HitAttributeSnippetResult
+    | HitAttributeSnippetResult[]
+    | HitSnippetResult;
+};
+
 export type Hit = {
-  _highlightResult?: object;
+  [attribute: string]: any;
+  objectID: string;
+  _highlightResult?: HitHighlightResult;
+  _snippetResult?: HitSnippetResult;
+  _rankingInfo?: {
+    promoted: boolean;
+    nbTypos: number;
+    firstMatchedWord: number;
+    proximityDistance?: number;
+    geoDistance: number;
+    geoPrecision?: number;
+    nbExactWords: number;
+    words: number;
+    filters: number;
+    userScore: number;
+    matchedGeoLocation?: {
+      lat: number;
+      lng: number;
+      distance: number;
+    };
+  };
+  _distinctSeqID?: number;
+  __position: number;
+  __queryID?: string;
 };
 
 // Documentation: https://www.algolia.com/doc/rest-api/search/?language=javascript#search-for-facet-values
@@ -155,43 +212,36 @@ export type SearchClient = {
 };
 
 export type InstantSearchConfig = {
-  appId?: string;
-  apiKey?: string;
+  searchClient: SearchClient;
   indexName: string;
 
   numberLocale?: string;
   searchFunction?: (helper: AlgoliaSearchHelper) => void;
-  createAlgoliaClient?: (
-    algoliasearch: Function,
-    appId: string,
-    apiKey: string
-  ) => object;
-  searchClient?: SearchClient;
   searchParameters?: SearchParameters | void;
   urlSync?:
     | boolean
     | {
-        mapping?: object;
-        threshold?: number;
-        trackedParameters?: string[];
-        useHash?: boolean;
-        getHistoryState?: () => object;
-      };
+    mapping?: object;
+    threshold?: number;
+    trackedParameters?: string[];
+    useHash?: boolean;
+    getHistoryState?: () => object;
+  };
   routing?:
     | boolean
     | {
-        router?: {
-          onUpdate: (cb: (object) => void) => void;
-          read: () => object;
-          write: (routeState: object) => void;
-          createURL: (routeState: object) => string;
-          dispose: () => void;
-        };
-        stateMapping?: {
-          stateToRoute(object): object;
-          routeToState(object): object;
-        };
-      };
+    router?: {
+      onUpdate: (cb: (object) => void) => void;
+      read: () => object;
+      write: (routeState: object) => void;
+      createURL: (routeState: object) => string;
+      dispose: () => void;
+    };
+    stateMapping?: {
+      stateToRoute(object): object;
+      routeToState(object): object;
+    };
+  };
 };
 
 export class InstantSearchInstance {
@@ -243,8 +293,10 @@ export class NgAisInstantSearch implements AfterViewInit, OnInit, OnDestroy {
   }
 
   public ngOnDestroy() {
-    this.instantSearchInstance.removeListener('render', this.onRender);
-    this.instantSearchInstance.dispose();
+    if (this.instantSearchInstance) {
+      this.instantSearchInstance.removeListener('render', this.onRender);
+      this.instantSearchInstance.dispose();
+    }
   }
 
   public createInstantSearchInstance(config: InstantSearchConfig) {
@@ -261,29 +313,25 @@ export class NgAisInstantSearch implements AfterViewInit, OnInit, OnDestroy {
       if (typeof config.routing !== 'undefined') delete config.routing;
     }
 
-    if (!config.searchClient && !config.createAlgoliaClient) {
-      const client = algoliasearch(config.appId, config.apiKey);
-      config.searchClient = client;
-      config.appId = undefined;
-      config.apiKey = undefined;
-    }
-
-    // custom algolia client agent
     if (typeof config.searchClient.addAlgoliaAgent === 'function') {
-      // add user agents
       config.searchClient.addAlgoliaAgent(`angular (${AngularVersion.full})`);
       config.searchClient.addAlgoliaAgent(`angular-instantsearch (${VERSION})`);
     }
+
     this.instantSearchInstance = instantsearch(config);
     this.instantSearchInstance.on('render', this.onRender);
   }
 
   public addWidget(widget: Widget) {
-    this.instantSearchInstance.addWidget(widget);
+    if (this.instantSearchInstance) {
+      this.instantSearchInstance.addWidget(widget);
+    }
   }
 
   public removeWidget(widget: Widget) {
-    this.instantSearchInstance.removeWidget(widget);
+    if (this.instantSearchInstance) {
+      this.instantSearchInstance.removeWidget(widget);
+    }
   }
 
   public refresh() {

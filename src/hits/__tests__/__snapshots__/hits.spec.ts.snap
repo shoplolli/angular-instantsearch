@@ -108,7 +108,7 @@ exports[`Hits renders markup without state 1`] = `
 </ng-component>
 `;
 
-exports[`Hits should apply \`transformItems\` if specified 1`] = `
+exports[`Hits should expose hits to the passed template 1`] = `
 <ng-component
   testedWidget={[Function NgAisHits]}
 >
@@ -118,74 +118,44 @@ exports[`Hits should apply \`transformItems\` if specified 1`] = `
         class="ais-Hits"
       >
         
+        <ul>
+          
+          <li>
+             foo 
+          </li>
+          <li>
+             bar 
+          </li>
+          <li>
+             foobar 
+          </li>
+          <li>
+             barfoo 
+          </li>
+        </ul>
         
-        <div>
-          <ul
-            class="ais-Hits-list"
-          >
-            
-            <li
-              class="ais-Hits-item"
-            >
-              <ais-highlight
-                attribute="name"
-                ng-reflect-attribute="name"
-                ng-reflect-hit="[object Object]"
-              >
-                <span
-                  class="ais-Highlight"
-                >
-                  transformed - foo
-                </span>
-              </ais-highlight>
-            </li>
-            <li
-              class="ais-Hits-item"
-            >
-              <ais-highlight
-                attribute="name"
-                ng-reflect-attribute="name"
-                ng-reflect-hit="[object Object]"
-              >
-                <span
-                  class="ais-Highlight"
-                >
-                  transformed - bar
-                </span>
-              </ais-highlight>
-            </li>
-            <li
-              class="ais-Hits-item"
-            >
-              <ais-highlight
-                attribute="name"
-                ng-reflect-attribute="name"
-                ng-reflect-hit="[object Object]"
-              >
-                <span
-                  class="ais-Highlight"
-                >
-                  transformed - foobar
-                </span>
-              </ais-highlight>
-            </li>
-            <li
-              class="ais-Hits-item"
-            >
-              <ais-highlight
-                attribute="name"
-                ng-reflect-attribute="name"
-                ng-reflect-hit="[object Object]"
-              >
-                <span
-                  class="ais-Highlight"
-                >
-                  transformed - barfoo
-                </span>
-              </ais-highlight>
-            </li>
-          </ul>
-        </div>
+      </div>
+    </ais-hits>
+  </ais-instantsearch>
+</ng-component>
+`;
+
+exports[`Hits should expose results to the passed template 1`] = `
+<ng-component
+  testedWidget={[Function NgAisHits]}
+>
+  <ais-instantsearch>
+    <ais-hits>
+      <div
+        class="ais-Hits"
+      >
+        
+         {
+    "nbPages": 50,
+    "page": 0,
+    "hitsPerPage": 20
+  } 
+        
       </div>
     </ais-hits>
   </ais-instantsearch>

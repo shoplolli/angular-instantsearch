@@ -1,8 +1,14 @@
 import { Component, Input, Inject, forwardRef } from '@angular/core';
-import { connectClearAll } from 'instantsearch.js/es/connectors';
+import { connectClearRefinements } from 'instantsearch.js/es/connectors';
 import { BaseWidget } from '../base-widget';
 import { NgAisInstantSearch } from '../instantsearch/instantsearch';
 import { noop } from '../utils';
+
+type ClearRefinementsState = {
+  hasRefinements: boolean;
+  refine: () => void;
+  createURL: () => string;
+};
 
 @Component({
   selector: 'ais-clear-refinements',
@@ -16,22 +22,27 @@ import { noop } from '../utils';
         (click)="handleClick($event)"
         [disabled]="!state.hasRefinements"
       >
-        {{buttonLabel}}
+        {{resetLabel}}
       </button>
     </div>
   `,
 })
 export class NgAisClearRefinements extends BaseWidget {
-  @Input() public buttonLabel: string = 'Clear refinements';
-  @Input() public clearsQuery: boolean = false;
-  @Input() public excludeAttributes: string[] = [];
+  // rendering options
+  @Input() public resetLabel: string = 'Clear refinements';
 
-  public state = {
+  // instance options
+  @Input() public includedAttributes: string[];
+  @Input() public excludedAttributes: string[];
+  @Input() public transformItems?: (items: string[]) => string[];
+
+  public state: ClearRefinementsState = {
     hasRefinements: false,
     refine: noop,
+    createURL: () => '#',
   };
 
-  get isHidden() {
+  get isHidden(): boolean {
     return !this.state.hasRefinements && this.autoHideContainer;
   }
 
@@ -43,10 +54,10 @@ export class NgAisClearRefinements extends BaseWidget {
   }
 
   public ngOnInit() {
-    // we need to `createWidget` from `ngOnInit` to have `@Input()` intialized
-    this.createWidget(connectClearAll, {
-      clearsQuery: this.clearsQuery,
-      excludeAttributes: this.excludeAttributes,
+    this.createWidget(connectClearRefinements, {
+      includedAttributes: this.includedAttributes,
+      excludedAttributes: this.excludedAttributes,
+      transformItems: this.transformItems,
     });
 
     super.ngOnInit();

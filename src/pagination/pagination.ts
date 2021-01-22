@@ -8,7 +8,7 @@ import { parseNumberInput, noop } from '../utils';
 @Component({
   selector: 'ais-pagination',
   template: `
-    <div [class]="cx()">
+    <div [ngClass]="[cx(), state.nbPages <= 1 ? cx('', 'noRefinement') : '']">
       <ul [class]="cx('list')">
         <li
           *ngIf="showFirst"
@@ -104,14 +104,14 @@ import { parseNumberInput, noop } from '../utils';
   `,
 })
 export class NgAisPagination extends BaseWidget {
-  // render options
+  // rendering options
   @Input() public showFirst: boolean = true;
-  @Input() public showLast: boolean = false;
+  @Input() public showLast: boolean = true;
   @Input() public showPrevious: boolean = true;
   @Input() public showNext: boolean = true;
   @Input() public padding: number | string = 3;
 
-  // connector options
+  // instance options
   @Input() public totalPages?: number | string;
 
   public state = {
